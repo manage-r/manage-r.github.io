@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>План недели</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+  --paper: #FBFCFE;
+  --grid: #E6ECF4;
+  --grid-strong: #CDD8E6;
+  --surface: #FFFFFF;
+  --line: #D6DEE9;
+  --ink: #1E2940;
+  --muted: #65718A;
+  --pen: #D0382F;
+  --focus: #3D7BE0;
+
+  --cls-bg: #E1E4EA; --cls-ink: #363D4C; --cls-edge: #98A0AF;
+  --road-bg: #DDE8FA; --road-ink: #23457A; --road-edge: #6E9AE0;
+  --ra-bg: #ECE6FB; --ra-ink: #4A3B86; --ra-edge: #A08CE0;
+  --free-bg: #DCF0E3; --free-ink: #1B5A39; --free-edge: #3E9E68;
+
+  --s-sleep: #34416A;
+  --s-morning: #DCE1E9;
+  --s-cls: #A7AEBB;
+  --s-road: #86ACE6;
+  --s-ra: #B4A3E6;
+  --s-rest: #9ED3B2;
+  --s-friends: #F0C04F;
+  --s-chores: #E7A3BE;
+  --s-unexp: #E4AFA8;
+  --s-free: #2E8B57;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #161A21;
+    --grid: #1F252F;
+    --grid-strong: #2C3441;
+    --surface: #1C2129;
+    --line: #2E3643;
+    --ink: #E6EAF2;
+    --muted: #919BAD;
+    --pen: #FF6B5F;
+    --focus: #7EA8F0;
+
+    --cls-bg: #343A46; --cls-ink: #D9DDE5; --cls-edge: #6B7383;
+    --road-bg: #22385B; --road-ink: #C9DBF7; --road-edge: #5A87CF;
+    --ra-bg: #332A57; --ra-ink: #DCD3FA; --ra-edge: #8A76D4;
+    --free-bg: #173A28; --free-ink: #BDEBCF; --free-edge: #45B97A;
+
+    --s-sleep: #4A5A8C;
+    --s-morning: #2B313C;
+    --s-cls: #5A6272;
+    --s-road: #3F68A8;
+    --s-ra: #5E4F98;
+    --s-rest: #2F7050;
+    --s-friends: #B88E2C;
+    --s-chores: #8F4F6A;
+    --s-unexp: #7C433D;
+    --s-free: #48BC7D;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #161A21;
+  --grid: #1F252F;
+  --grid-strong: #2C3441;
+  --surface: #1C2129;
+  --line: #2E3643;
+  --ink: #E6EAF2;
+  --muted: #919BAD;
+  --pen: #FF6B5F;
+  --focus: #7EA8F0;
+
+  --cls-bg: #343A46; --cls-ink: #D9DDE5; --cls-edge: #6B7383;
+  --road-bg: #22385B; --road-ink: #C9DBF7; --road-edge: #5A87CF;
+  --ra-bg: #332A57; --ra-ink: #DCD3FA; --ra-edge: #8A76D4;
+  --free-bg: #173A28; --free-ink: #BDEBCF; --free-edge: #45B97A;
+
+  --s-sleep: #4A5A8C;
+  --s-morning: #2B313C;
+  --s-cls: #5A6272;
+  --s-road: #3F68A8;
+  --s-ra: #5E4F98;
+  --s-rest: #2F7050;
+  --s-friends: #B88E2C;
+  --s-chores: #8F4F6A;
+  --s-unexp: #7C433D;
+  --s-free: #48BC7D;
+}
+
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  font-family: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.hand { font-family: "Caveat", "Segoe Print", "Comic Sans MS", cursive; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+main { max-width: 1120px; margin: 0 auto; padding: 28px 20px 64px; }
+
+h1 { font-size: 15px; font-weight: 600; color: var(--muted); margin: 0 0 22px; }
+h2 { font-size: 19px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+.lead { color: var(--muted); margin: 0 0 16px; max-width: 64ch; }
+
+/* ---------- top ---------- */
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 36px;
+  align-items: end;
+}
+@media (max-width: 800px) { .top { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+
+.hero-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px; }
+.total-wrap { position: relative; display: inline-block; padding: 10px 24px 8px; margin-left: 6px; }
+.total {
+  font-size: clamp(46px, 9vw, 82px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.circle {
+  position: absolute;
+  left: -16px; top: -14px;
+  width: calc(100% + 32px); height: calc(100% + 30px);
+  overflow: visible; pointer-events: none;
+}
+.circle path {
+  fill: none; stroke: var(--pen); stroke-width: 2.6;
+  stroke-linecap: round; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .circle path { stroke-dasharray: 1.02; stroke-dashoffset: 1.02; animation: draw 1s .2s ease-out forwards; }
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+.per-day { font-size: 30px; line-height: 1.1; color: var(--ink); }
+.sub { color: var(--muted); margin: 18px 0 0; }
+.goal { color: var(--pen); font-size: 25px; line-height: 1.15; margin-top: 2px; }
+
+.ledger {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 20px 14px;
+}
+.ledger h2 { font-size: 15px; margin-bottom: 10px; }
+.lrow { display: flex; align-items: baseline; gap: 10px; padding: 3px 0; }
+.lrow .lbl { white-space: nowrap; }
+.lrow .dots { flex: 1; border-bottom: 1.5px dotted var(--grid-strong); transform: translateY(-5px); min-width: 12px; }
+.lrow .val { font-variant-numeric: tabular-nums; font-weight: 500; }
+.lrow.minus .lbl { color: var(--muted); }
+.lrow.result { margin-top: 8px; padding-top: 9px; border-top: 1.5px solid var(--ink); font-weight: 700; }
+.lrow.result .val { font-weight: 700; }
+
+/* ---------- calendar ---------- */
+.section { margin-top: 48px; }
+.cal-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.cal-scroll { overflow-x: auto; }
+.cal {
+  display: grid;
+  grid-template-columns: 54px repeat(7, minmax(92px, 1fr));
+  min-width: 720px;
+}
+.dh {
+  padding: 10px 8px 10px;
+  border-left: 1px solid var(--grid-strong);
+  border-bottom: 1px solid var(--grid-strong);
+  background: var(--surface);
+  min-height: 84px;
+}
+.corner { position: sticky; left: 0; z-index: 3; border-bottom: 1px solid var(--grid-strong); background: var(--surface); }
+.dh .name { font-weight: 600; font-size: 15px; }
+.dh .daytype {
+  margin-top: 5px;
+  font: inherit; font-size: 12px; line-height: 1.3;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.dh .daytype.off { border-color: var(--free-edge); color: var(--free-ink); background: var(--free-bg); }
+.dh .daytype:hover { border-color: var(--muted); }
+.dh .note { color: var(--pen); font-size: 17px; line-height: 1.05; margin-top: 6px; }
+
+.axis { position: sticky; left: 0; z-index: 2; background: var(--paper); }
+.axis span {
+  position: absolute; right: 8px;
+  font-size: 11.5px; color: var(--muted);
+  transform: translateY(-50%);
+  font-variant-numeric: tabular-nums;
+}
+.col {
+  position: relative;
+  border-left: 1px solid var(--grid-strong);
+  background-image:
+    repeating-linear-gradient(to bottom, var(--grid-strong) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 24px);
+}
+.blk {
+  position: absolute; left: 4px; right: 4px;
+  border-radius: 6px;
+  border-left: 3px solid;
+  padding: 4px 7px;
+  overflow: hidden;
+  font-size: 12px; line-height: 1.28;
+}
+.blk .t { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.blk .s { font-variant-numeric: tabular-nums; opacity: .88; }
+.blk .x { margin-top: 6px; font-variant-numeric: tabular-nums; }
+.blk.compact { padding-top: 2px; padding-bottom: 2px; display: flex; align-items: center; }
+.blk.compact .t { font-weight: 500; }
+.blk.cls  { background: var(--cls-bg);  color: var(--cls-ink);  border-color: var(--cls-edge); }
+.blk.road { background: var(--road-bg); color: var(--road-ink); border-color: var(--road-edge); }
+.blk.ra   { background: var(--ra-bg);   color: var(--ra-ink);   border-color: var(--ra-edge); }
+.blk.free { background: var(--free-bg); color: var(--free-ink); border-color: var(--free-edge); }
+.blk.free .x strong { font-weight: 700; }
+.cal-foot { color: var(--muted); font-size: 13px; margin: 10px 2px 0; }
+
+/* ---------- week bar ---------- */
+.bar {
+  display: flex; height: 38px; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--line); background: var(--surface);
+}
+.bar div { height: 100%; min-width: 0; }
+.legend {
+  list-style: none; margin: 16px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 6px 28px;
+}
+.legend li { display: flex; align-items: baseline; gap: 10px; padding: 3px 0; border-bottom: 1px solid var(--grid); }
+.legend .sw { width: 12px; height: 12px; border-radius: 3px; flex: none; transform: translateY(1px); }
+.legend .nm { flex: 1; }
+.legend .v { font-variant-numeric: tabular-nums; font-weight: 500; }
+.legend .p { font-variant-numeric: tabular-nums; color: var(--muted); width: 3.2em; text-align: right; }
+.legend li.strong .nm, .legend li.strong .v { font-weight: 700; }
+.hatch { background-image: repeating-linear-gradient(135deg, transparent 0 4px, rgba(255,255,255,.35) 4px 7px); }
+
+/* ---------- settings ---------- */
+.settings {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 14px;
+}
+@media (max-width: 860px) { .settings { grid-template-columns: minmax(0, 1fr); } }
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px 18px;
+  min-width: 0;
+}
+.panel h3 { font-size: 15px; font-weight: 600; margin: 0 0 12px; }
+.tbl-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 470px; }
+th, td { text-align: left; padding: 6px 6px 6px 0; vertical-align: middle; }
+thead th { font-size: 12.5px; font-weight: 500; color: var(--muted); border-bottom: 1px solid var(--line); }
+tbody th { font-weight: 500; white-space: nowrap; }
+tbody tr + tr th, tbody tr + tr td { border-top: 1px solid var(--grid); }
+
+input, select {
+  font: inherit; font-size: 14px; color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-variant-numeric: tabular-nums;
+}
+input[type="time"] { width: 7.6em; }
+input[type="number"] { width: 5.4em; }
+select { max-width: 100%; }
+.linkbtn {
+  font: inherit; font-size: 13px; color: var(--muted);
+  background: none; border: none; padding: 4px 2px; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--grid-strong);
+}
+.linkbtn:hover { color: var(--ink); }
+
+.params { display: grid; gap: 2px; }
+.prow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--grid); }
+.prow:last-child { border-bottom: 0; }
+.prow label { line-height: 1.3; }
+.prow .unit { color: var(--muted); font-size: 13px; }
+.prow .ctl { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.prow .hint { color: var(--muted); font-size: 12.5px; min-width: 4.6em; }
+.group-gap { height: 10px; border-bottom: 0 !important; }
+
+.actions { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.btn {
+  font: inherit; font-size: 14px; font-weight: 500;
+  padding: 8px 14px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--muted); }
+.saved { color: var(--muted); font-size: 13px; }
+button, select, input { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (max-width: 600px) { input, select { font-size: 16px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>План недели</h1>
+
+  <div class="top">
+    <div>
+      <div class="hero-row">
+        <div class="total-wrap">
+          <div class="total" id="total">27 ч 40 мин</div>
+          <svg class="circle" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+            <path pathLength="1" d="M 140 12 C 250 2, 394 18, 394 60 C 394 100, 300 115, 198 114 C 96 113, 8 100, 8 62 C 8 26, 92 8, 196 6"/>
+          </svg>
+        </div>
+        <div class="per-day hand" id="perDay">≈ 3 ч 57 мин в день</div>
+      </div>
+      <p class="sub">свободно за неделю после пар, дороги, отдыха, встреч, быта и запаса на непредвиденное</p>
+      <div class="goal hand" id="goal"></div>
+    </div>
+
+    <div class="ledger" aria-live="polite">
+      <h2>Как получилось</h2>
+      <div id="ledger"></div>
+    </div>
+  </div>
+
+  <section class="section" aria-labelledby="calTitle">
+    <h2 id="calTitle">Неделя по часам</h2>
+    <p class="lead">Зелёное — личное время: из него и берутся отдых, друзья, быт и запас. Нажми «рабочий» или «нерабочий» под днём, чтобы поменять норму отдыха.</p>
+    <div class="cal-card">
+      <div class="cal-scroll">
+        <div class="cal" id="cal"></div>
+      </div>
+    </div>
+    <p class="cal-foot" id="calFoot"></p>
+  </section>
+
+  <section class="section" aria-labelledby="weekTitle">
+    <h2 id="weekTitle">Куда уходят 168 часов</h2>
+    <p class="lead">Вся неделя целиком, включая сон и утро до начала дня.</p>
+    <div class="bar" id="bar" role="img" aria-label="Распределение 168 часов недели"></div>
+    <ul class="legend" id="legend"></ul>
+  </section>
+
+  <section class="section" aria-labelledby="setTitle">
+    <h2 id="setTitle">Исходные данные</h2>
+    <p class="lead" id="storeNote">Меняй что угодно — всё пересчитается сразу.</p>
+    <div class="settings">
+      <div class="panel">
+        <h3>Пары и тип дня</h3>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>День</th><th>Пары с</th><th>до</th><th>Тип дня</th><th></th></tr></thead>
+            <tbody id="daysBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Нормы</h3>
+        <div class="params" id="params"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="reset" type="button">Вернуть исходные</button>
+      <span class="saved" id="saved"></span>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var KEY = "plan-nedeli-v1";
+  var DAY_SHORT = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+  var DAY_FULL = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+  var PPM = 48 / 60; // pixels per minute
+
+  var DEFAULTS = {
+    dayStart: "09:30", dayEnd: "23:30",
+    sleep: 8, commute: 1.5, restAfter: 0.75,
+    restWork: 2, restOff: 4,
+    friends: 4, chores: 4, unexpected: 10,
+    goal: 29,
+    days: [
+      { start: "10:30", end: "13:20", type: "work" },
+      { start: "09:00", end: "16:50", type: "work" },
+      { start: "", end: "", type: "off" },
+      { start: "", end: "", type: "off" },
+      { start: "09:00", end: "16:50", type: "work" },
+      { start: "09:30", end: "14:20", type: "work" },
+      { start: "", end: "", type: "off" }
+    ]
+  };
+
+  var PARAMS = [
+    { k: "dayStart", label: "Начало дня", type: "time" },
+    { k: "dayEnd", label: "Конец дня", type: "time" },
+    { k: "sleep", label: "Сон", unit: "ч в сутки" },
+    { gap: true },
+    { k: "commute", label: "Дорога после пар", unit: "ч" },
+    { k: "restAfter", label: "Отдых после пар", unit: "ч" },
+    { k: "restWork", label: "Отдых в рабочий день", unit: "ч" },
+    { k: "restOff", label: "Отдых в нерабочий день", unit: "ч" },
+    { gap: true },
+    { k: "friends", label: "Встречи с друзьями", unit: "ч в неделю" },
+    { k: "chores", label: "Бытовые дела", unit: "ч в неделю" },
+    { k: "unexpected", label: "Непредвиденное", unit: "ч в неделю" },
+    { k: "goal", label: "Планка свободного времени", unit: "ч в неделю" }
+  ];
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  // ---------- Telegram ----------
+  var tg = (window.Telegram && window.Telegram.WebApp) || null;
+  var inTg = !!(tg && tg.platform && tg.platform !== "unknown");
+  var cloud = null;
+  try {
+    if (inTg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast("6.9")) cloud = tg.CloudStorage;
+  } catch (e) { cloud = null; }
+
+  function haptic() {
+    try { if (inTg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged(); } catch (e) {}
+  }
+
+  function applyTelegramTheme() {
+    if (!inTg) return;
+    try {
+      if (tg.colorScheme === "dark" || tg.colorScheme === "light") {
+        document.documentElement.setAttribute("data-theme", tg.colorScheme);
+      }
+      var bg = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim();
+      if (bg && tg.isVersionAtLeast("6.9")) {
+        tg.setHeaderColor(bg);
+        tg.setBackgroundColor(bg);
+        if (tg.isVersionAtLeast("7.10")) tg.setBottomBarColor(bg);
+      }
+    } catch (e) {}
+  }
+
+  if (inTg) {
+    try { tg.ready(); tg.expand(); } catch (e) {}
+    applyTelegramTheme();
+    try { tg.onEvent("themeChanged", applyTelegramTheme); } catch (e) {}
+  }
+
+  // ---------- storage ----------
+  function parse(raw) {
+    try {
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      var s = clone(DEFAULTS);
+      Object.keys(s).forEach(function (k) {
+        if (k !== "days" && o[k] !== undefined && o[k] !== null) s[k] = o[k];
+      });
+      if (Array.isArray(o.days) && o.days.length === 7) {
+        s.days = o.days.map(function (d, i) {
+          return {
+            start: typeof d.start === "string" ? d.start : DEFAULTS.days[i].start,
+            end: typeof d.end === "string" ? d.end : DEFAULTS.days[i].end,
+            type: d.type === "off" ? "off" : "work"
+          };
+        });
+      }
+      s.updatedAt = typeof o.updatedAt === "number" ? o.updatedAt : 0;
+      return s;
+    } catch (e) { return null; }
+  }
+
+  var savedEl = document.getElementById("saved");
+  var pushTimer = null;
+
+  function pushCloud() {
+    if (!cloud) return;
+    try {
+      cloud.setItem(KEY, JSON.stringify(state), function (err) {
+        savedEl.textContent = err ? "Сохранено на этом устройстве" : "Сохранено в облаке Telegram";
+      });
+    } catch (e) {
+      savedEl.textContent = "Сохранено на этом устройстве";
+    }
+  }
+
+  function save() {
+    state.updatedAt = Date.now();
+    var ok = true;
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { ok = false; }
+    if (cloud) {
+      clearTimeout(pushTimer);
+      pushTimer = setTimeout(pushCloud, 400);
+    } else {
+      savedEl.textContent = ok ? "Сохранено в этом браузере" : "";
+    }
+  }
+
+  var localRaw = null;
+  try { localRaw = localStorage.getItem(KEY); } catch (e) {}
+  var state = parse(localRaw) || clone(DEFAULTS);
+  state.updatedAt = state.updatedAt || 0;
+
+  function syncFromCloud() {
+    if (!cloud) return;
+    try {
+      cloud.getItem(KEY, function (err, val) {
+        if (err) return;
+        var c = parse(val);
+        if (c && c.updatedAt > state.updatedAt) {
+          state = c;
+          try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+          buildSettings();
+          renderAll();
+          savedEl.textContent = "Загружено из облака Telegram";
+        } else if (state.updatedAt > 0 && (!c || state.updatedAt > c.updatedAt)) {
+          pushCloud();
+        }
+      });
+    } catch (e) {}
+  }
+
+  // ---------- helpers ----------
+  function toMin(s) {
+    if (!s || typeof s !== "string") return null;
+    var p = s.split(":");
+    if (p.length < 2) return null;
+    var h = parseInt(p[0], 10), m = parseInt(p[1], 10);
+    if (isNaN(h) || isNaN(m)) return null;
+    return h * 60 + m;
+  }
+  function num(v) {
+    var n = parseFloat(String(v).replace(",", "."));
+    return isNaN(n) || n < 0 ? 0 : n;
+  }
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
+  function clock(min) {
+    var m = ((Math.round(min) % 1440) + 1440) % 1440;
+    return Math.floor(m / 60) + ":" + pad(m % 60);
+  }
+  function hm(min) {
+    var sign = min < 0 ? "−" : "";
+    var m = Math.round(Math.abs(min));
+    return sign + Math.floor(m / 60) + ":" + pad(m % 60);
+  }
+  function long(min) {
+    var sign = min < 0 ? "−" : "";
+    var m = Math.round(Math.abs(min));
+    var h = Math.floor(m / 60), r = m % 60;
+    if (h && r) return sign + h + " ч " + r + " мин";
+    if (h) return sign + h + " ч";
+    return sign + r + " мин";
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  // ---------- model ----------
+  function compute() {
+    var ds = toMin(state.dayStart); if (ds === null) ds = 570;
+    var de = toMin(state.dayEnd); if (de === null) de = 1410;
+    var cm = num(state.commute) * 60, ra = num(state.restAfter) * 60;
+    var rw = num(state.restWork) * 60, ro = num(state.restOff) * 60;
+    var sleep = num(state.sleep) * 60;
+    var wake = ((de + sleep) % 1440 + 1440) % 1440;
+
+    var days = state.days.map(function (d, i) {
+      var s = toMin(d.start), e = toMin(d.end);
+      var has = s !== null && e !== null && e > s;
+      var freeFrom = has ? e + cm + ra : ds;
+      var win = Math.max(0, de - freeFrom);
+      var rest = d.type === "off" ? ro : rw;
+      return {
+        i: i, has: has, s: s, e: e, type: d.type,
+        freeFrom: freeFrom, win: win, rest: rest, after: win - rest,
+        slack: has ? s - wake - cm : null,
+        classes: has ? e - s : 0
+      };
+    });
+
+    var t = { win: 0, rest: 0, classes: 0, classDays: 0 };
+    days.forEach(function (d) {
+      t.win += d.win; t.rest += d.rest; t.classes += d.classes;
+      if (d.has) t.classDays++;
+    });
+    t.friends = num(state.friends) * 60;
+    t.chores = num(state.chores) * 60;
+    t.unexpected = num(state.unexpected) * 60;
+    t.free = t.win - t.rest - t.friends - t.chores - t.unexpected;
+    t.road = t.classDays * cm;
+    t.ra = t.classDays * ra;
+    t.sleep = 7 * sleep;
+    t.morning = 10080 - t.sleep - t.classes - t.road - t.ra - t.win;
+    t.goal = num(state.goal) * 60;
+    return { ds: ds, de: de, cm: cm, ra: ra, wake: wake, days: days, t: t };
+  }
+
+  // ---------- render: top ----------
+  function renderTop(m) {
+    var t = m.t;
+    document.getElementById("total").textContent = long(t.free);
+    document.getElementById("perDay").textContent = "≈ " + long(t.free / 7) + " в день";
+    var g = document.getElementById("goal");
+    if (t.goal > 0) {
+      var diff = t.free - t.goal;
+      g.textContent = diff >= 0
+        ? "планка " + long(t.goal) + " взята, сверху ещё " + long(diff)
+        : "до планки " + long(t.goal) + " не хватает " + long(-diff);
+    } else {
+      g.textContent = "";
+    }
+
+    var rows = [
+      ["Личное время за неделю", t.win, ""],
+      ["− отдых", t.rest, "minus"],
+      ["− встречи с друзьями", t.friends, "minus"],
+      ["− бытовые дела", t.chores, "minus"],
+      ["− непредвиденное", t.unexpected, "minus"],
+      ["= свободно", t.free, "result"]
+    ];
+    var box = document.getElementById("ledger");
+    box.textContent = "";
+    rows.forEach(function (r) {
+      var row = el("div", "lrow " + r[2]);
+      row.appendChild(el("span", "lbl", r[0]));
+      row.appendChild(el("span", "dots"));
+      row.appendChild(el("span", "val", hm(r[1])));
+      box.appendChild(row);
+    });
+  }
+
+  // ---------- render: calendar ----------
+  function block(col, cls, from, to, axisStart, title, sub, extra, short) {
+    var top = (from - axisStart) * PPM;
+    var h = (to - from) * PPM - 2;
+    if (h <= 4) return;
+    var b = el("div", "blk " + cls);
+    b.style.top = (top + 1) + "px";
+    b.style.height = h + "px";
+    if (h < 44) {
+      b.classList.add("compact");
+      b.appendChild(el("div", "t", (short || title) + ", " + long(to - from)));
+      b.title = title + " " + clock(from) + "–" + clock(to);
+    } else {
+      b.appendChild(el("div", "t", title));
+      b.appendChild(el("div", "s", sub));
+      if (extra && h >= 84) {
+        var x = el("div", "x");
+        x.appendChild(document.createTextNode("после отдыха "));
+        x.appendChild(el("strong", "", extra));
+        b.appendChild(x);
+      }
+    }
+    col.appendChild(b);
+  }
+
+  function renderCalendar(m) {
+    var cal = document.getElementById("cal");
+    cal.textContent = "";
+
+    var minStart = m.ds, maxEnd = m.de;
+    m.days.forEach(function (d) {
+      if (d.has) {
+        minStart = Math.min(minStart, d.s);
+        maxEnd = Math.max(maxEnd, d.freeFrom);
+      }
+    });
+    var axisStart = Math.floor(minStart / 60) * 60;
+    var axisEnd = Math.ceil(maxEnd / 30) * 30;
+    var height = (axisEnd - axisStart) * PPM;
+
+    // header row
+    cal.appendChild(el("div", "corner"));
+    m.days.forEach(function (d) {
+      var h = el("div", "dh");
+      h.appendChild(el("div", "name", DAY_SHORT[d.i]));
+      var btn = el("button", "daytype" + (d.type === "off" ? " off" : ""), d.type === "off" ? "нерабочий" : "рабочий");
+      btn.type = "button";
+      btn.title = "Отдых " + long(d.rest) + ". Нажми, чтобы переключить";
+      btn.setAttribute("aria-label", DAY_FULL[d.i] + ": " + (d.type === "off" ? "нерабочий" : "рабочий") + " день, отдых " + long(d.rest) + ". Переключить");
+      btn.addEventListener("click", function () {
+        haptic();
+        state.days[d.i].type = state.days[d.i].type === "off" ? "work" : "off";
+        var sel = document.getElementById("type-" + d.i);
+        if (sel) sel.value = state.days[d.i].type;
+        save(); renderAll();
+      });
+      h.appendChild(btn);
+      if (d.slack !== null && d.slack < 30) {
+        var txt = d.slack <= 0
+          ? "подъём в " + clock(m.wake) + " — и сразу в дорогу"
+          : "на сборы " + Math.round(d.slack) + " мин";
+        h.appendChild(el("div", "note hand", txt));
+      }
+      cal.appendChild(h);
+    });
+
+    // axis
+    var axis = el("div", "axis");
+    axis.style.height = height + "px";
+    for (var tm = axisStart; tm <= axisEnd; tm += 60) {
+      if (tm === axisStart) continue;
+      var lab = el("span", "", clock(tm));
+      lab.style.top = ((tm - axisStart) * PPM) + "px";
+      axis.appendChild(lab);
+    }
+    if ((axisEnd - axisStart) % 60 !== 0) {
+      var last = el("span", "", clock(axisEnd));
+      last.style.top = (height - 8) + "px";
+      axis.appendChild(last);
+    }
+    cal.appendChild(axis);
+
+    // day columns
+    m.days.forEach(function (d) {
+      var col = el("div", "col");
+      col.style.height = height + "px";
+      if (d.has) {
+        var r1 = d.e + m.cm, r2 = r1 + m.ra;
+        block(col, "cls", d.s, d.e, axisStart, "Пары", clock(d.s) + "–" + clock(d.e));
+        block(col, "road", d.e, r1, axisStart, "Дорога", clock(d.e) + "–" + clock(r1));
+        block(col, "ra", r1, r2, axisStart, "Отдых после пар", clock(r1) + "–" + clock(r2), null, "Отдых");
+      }
+      if (d.win > 0) {
+        block(col, "free", d.freeFrom, m.de, axisStart, "Личное время",
+          clock(d.freeFrom) + "–" + clock(m.de) + ", " + hm(d.win), hm(d.after));
+      }
+      cal.appendChild(col);
+    });
+
+    var foot = "Сон считается с конца дня: " + long(num(state.sleep) * 60) + ", подъём в " + clock(m.wake) + ".";
+    if (m.days.some(function (d) { return d.slack !== null && d.slack < 30; })) {
+      foot += " Красная пометка: утренняя дорога, если она такая же, как обратная (" + long(m.cm) + "), почти не оставляет времени на сборы — в эти дни придётся вставать раньше, а накануне ложиться раньше.";
+    }
+    document.getElementById("calFoot").textContent = foot;
+  }
+
+  // ---------- render: week bar ----------
+  function renderBar(m) {
+    var t = m.t;
+    var segs = [
+      ["Сон", t.sleep, "--s-sleep"],
+      ["Утро, сборы, дорога на пары", Math.max(0, t.morning), "--s-morning"],
+      ["Пары", t.classes, "--s-cls"],
+      ["Дорога после пар", t.road, "--s-road"],
+      ["Отдых после пар", t.ra, "--s-ra"],
+      ["Отдых", t.rest, "--s-rest"],
+      ["Встречи с друзьями", t.friends, "--s-friends"],
+      ["Бытовые дела", t.chores, "--s-chores"],
+      ["Непредвиденное", t.unexpected, "--s-unexp", true],
+      ["Свободно", Math.max(0, t.free), "--s-free", false, true]
+    ];
+    var total = segs.reduce(function (a, s) { return a + s[1]; }, 0) || 1;
+    var bar = document.getElementById("bar");
+    var legend = document.getElementById("legend");
+    bar.textContent = ""; legend.textContent = "";
+    segs.forEach(function (s) {
+      var pct = s[1] / total * 100;
+      var d = el("div", s[3] ? "hatch" : "");
+      d.style.width = pct + "%";
+      d.style.backgroundColor = "var(" + s[2] + ")";
+      d.title = s[0] + ": " + hm(s[1]);
+      bar.appendChild(d);
+
+      var li = el("li", s[4] ? "strong" : "");
+      var sw = el("span", "sw" + (s[3] ? " hatch" : ""));
+      sw.style.backgroundColor = "var(" + s[2] + ")";
+      li.appendChild(sw);
+      li.appendChild(el("span", "nm", s[0]));
+      li.appendChild(el("span", "v", hm(s[1])));
+      li.appendChild(el("span", "p", (Math.round(s[1] / 10080 * 1000) / 10).toString().replace(".", ",") + "%"));
+      legend.appendChild(li);
+    });
+  }
+
+  // ---------- settings (built once) ----------
+  function buildSettings() {
+    var body = document.getElementById("daysBody");
+    body.textContent = "";
+    state.days.forEach(function (d, i) {
+      var tr = el("tr");
+      tr.appendChild(el("th", "", DAY_FULL[i]));
+
+      ["start", "end"].forEach(function (k) {
+        var td = el("td");
+        var inp = el("input");
+        inp.type = "time";
+        inp.value = d[k];
+        inp.id = k + "-" + i;
+        inp.setAttribute("aria-label", DAY_FULL[i] + ": пары " + (k === "start" ? "с" : "до"));
+        inp.addEventListener("input", function () {
+          state.days[i][k] = inp.value;
+          save(); renderAll();
+        });
+        td.appendChild(inp);
+        tr.appendChild(td);
+      });
+
+      var tdSel = el("td");
+      var sel = el("select");
+      sel.id = "type-" + i;
+      sel.setAttribute("aria-label", DAY_FULL[i] + ": тип дня");
+      var o1 = el("option", "", ""); o1.value = "work";
+      var o2 = el("option", "", ""); o2.value = "off";
+      sel.appendChild(o1); sel.appendChild(o2);
+      sel.value = d.type;
+      sel.addEventListener("change", function () {
+        state.days[i].type = sel.value;
+        save(); renderAll();
+      });
+      tdSel.appendChild(sel);
+      tr.appendChild(tdSel);
+
+      var tdBtn = el("td");
+      var clr = el("button", "linkbtn", "нет пар");
+      clr.type = "button";
+      clr.addEventListener("click", function () {
+        state.days[i].start = ""; state.days[i].end = "";
+        document.getElementById("start-" + i).value = "";
+        document.getElementById("end-" + i).value = "";
+        save(); renderAll();
+      });
+      tdBtn.appendChild(clr);
+      tr.appendChild(tdBtn);
+      body.appendChild(tr);
+    });
+
+    var box = document.getElementById("params");
+    box.textContent = "";
+    PARAMS.forEach(function (p) {
+      if (p.gap) { box.appendChild(el("div", "prow group-gap")); return; }
+      var row = el("div", "prow");
+      var lab = el("label", "", p.label);
+      lab.htmlFor = "p-" + p.k;
+      row.appendChild(lab);
+      var ctl = el("div", "ctl");
+      var inp = el("input");
+      inp.id = "p-" + p.k;
+      if (p.type === "time") {
+        inp.type = "time";
+        inp.value = state[p.k];
+      } else {
+        inp.type = "number";
+        inp.step = "0.25";
+        inp.min = "0";
+        inp.inputMode = "decimal";
+        inp.value = state[p.k];
+      }
+      ctl.appendChild(inp);
+      var hint = el("span", "hint");
+      hint.id = "h-" + p.k;
+      ctl.appendChild(hint);
+      inp.addEventListener("input", function () {
+        state[p.k] = p.type === "time" ? inp.value : inp.value;
+        save(); renderAll();
+      });
+      row.appendChild(ctl);
+      box.appendChild(row);
+    });
+  }
+
+  function refreshSettingsText(m) {
+    state.days.forEach(function (d, i) {
+      var sel = document.getElementById("type-" + i);
+      if (!sel) return;
+      sel.options[0].textContent = "рабочий, отдых " + long(num(state.restWork) * 60);
+      sel.options[1].textContent = "нерабочий, отдых " + long(num(state.restOff) * 60);
+      sel.value = d.type;
+    });
+    PARAMS.forEach(function (p) {
+      if (p.gap || p.type === "time") {
+        if (!p.gap) { var hh = document.getElementById("h-" + p.k); if (hh) hh.textContent = ""; }
+        return;
+      }
+      var h = document.getElementById("h-" + p.k);
+      var v = num(state[p.k]);
+      if (!h) return;
+      var unit = p.unit || "ч";
+      h.textContent = Math.round(v * 60) % 60 !== 0 ? "= " + long(v * 60) : unit;
+    });
+  }
+
+  function renderAll() {
+    var m = compute();
+    renderTop(m);
+    renderCalendar(m);
+    renderBar(m);
+    refreshSettingsText(m);
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    function doReset() {
+      state = clone(DEFAULTS);
+      save();
+      buildSettings();
+      renderAll();
+    }
+    var ask = "Вернуть исходные значения? Твои пары и нормы будут заменены.";
+    if (inTg && tg.showConfirm) {
+      try { tg.showConfirm(ask, function (ok) { if (ok) doReset(); }); return; } catch (e) {}
+    }
+    if (window.confirm(ask)) doReset();
+  });
+
+  document.getElementById("storeNote").textContent = cloud
+    ? "Меняй что угодно — всё пересчитается сразу. Значения хранятся в облаке твоего аккаунта Telegram и подтянутся на другом устройстве, так что на следующей неделе достаточно поправить пары."
+    : "Меняй что угодно — всё пересчитается сразу. Значения запоминаются в этом браузере, так что на следующей неделе достаточно поправить пары.";
+
+  buildSettings();
+  renderAll();
+  syncFromCloud();
+})();
+</script>
+</body>
+</html>
